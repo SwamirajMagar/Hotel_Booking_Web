@@ -109,16 +109,17 @@ const RoomDetails = () => {
 
           {/* Hosted by */}
           <div>
-             <div>
+             <div flex gap-4>
                <img src={room.hotel.owner.image} alt="Host" className='h-14 w-14 md:h-18 md:w-18 rounded-full' />
                 <div>
                    <p className='text-lg md:text-xl'>Hosted By {room.hotel.name}</p>
-                   <div>
+                   <div className='flex flex-row items-center mt-1'>
                      <StarRating />
                      <p className='ml-2'>200+ Reviews</p>
                    </div>
                 </div>
              </div>
+             <button className='px-6 py-2.5 rounded text-white bg-primary hover:bg-primary-dull transition-all cursor-pointer'>Contact Now</button>
           </div>
             
     </div>
