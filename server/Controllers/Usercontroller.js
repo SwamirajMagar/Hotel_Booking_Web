@@ -1,7 +1,6 @@
 
 //GET /api/user/
 
-import { Message } from "svix/dist/api/message";
 
 export const getUserData = async (req,res)=> {
     try {
