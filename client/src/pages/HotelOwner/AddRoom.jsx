@@ -38,7 +38,7 @@ const AddRoom = () => {
         try {
             const formData = new FormData()
             formData.append('roomType', inputs.roomType)
-            formData.append('pricePerNight', inputs.pricePerNightType)
+            formData.append('pricePerNight', inputs.pricePerNight)
             //convert amenities into array 
             const amenities = Object.keys(inputs.amenities).filter(key=> inputs.amenities[key])
             formData.append('amenities', JSON.stringify(amenities))
@@ -48,7 +48,7 @@ const AddRoom = () => {
                 images[key] && formData.append('images', images[key])
             })
 
-            const {data}= await axios.post('api/rooms/', formData, {Headers: {Authorization: `Bearer ${await getToken}`}})
+            const {data}= await axios.post('api/rooms/', formData, {Headers: {Authorization: `Bearer ${await getToken()}`}})
 
             if (data.success) {
                 toast.success(data.success)
@@ -120,7 +120,7 @@ const AddRoom = () => {
                 ))}
             </div>
             <button className="bg-blue-800 text-white px-8 py-2 rounded mt-8 cursor-pointer">
-                Add Room
+               {loading ? "adding..." : "Add Room"}
             </button>
         </form>
     )
