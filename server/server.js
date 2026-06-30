@@ -17,11 +17,12 @@ const app = express()
 app.use(cors())
 
 //Middleware
+app.use("/api/clerk", express.raw({ type: "application/json" }))
 app.use(express.json())
 app.use(clerkMiddleware())
 
 //API TO LISTEN CLERK WEBHOOK
-app.use("/api/clerk" , clerkWebhooks)
+app.use("/api/clerk", clerkWebhooks)
 
 app.get('/', (req, res)=> res.send("API is working"))
 app.use('/api/user',userRouter)

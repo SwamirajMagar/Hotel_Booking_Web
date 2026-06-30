@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { assets, facilityIcons, roomsDummyData } from '../assets/assets';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import StarRating from '../components/StarRating';
+import { useAppContext } from '../context/AppContext';
 
 const CheckBox = ({ label, selected = false, onChnage = () => { } }) => {
   return (
@@ -24,8 +25,14 @@ const RadioButton = ({ label, selected = false, onChnage = () => { } }) => {
 }
 
 const AllRoom = () => {
-  const navigate = useNavigate();
-  const [openFilters, setOpenFilters] = useState(false)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const {rooms ,navigate, currency} = useAppContext();
+  const [openFilters, setOpenFilters] = useState(false);
+  const[SelectedFilters, setSelectedFilters] = useState({
+    roomType: [],
+    priceRange: [],
+  });
+  const [selectedSort, setSelectedSort] = useState('')
 
   const roomTypes = [
     "Single Bed",
@@ -46,7 +53,26 @@ const AllRoom = () => {
     "Newest First"
   ];
 
+  // Handle changes for filters and sorting
+  const handleFilterChange = (checked, value, type) =>{
+    setSelectedFilters((prevFilters)=>{
+        const updatedFilters = {...prevFilters};
+        if (checked) {
+          updatedFilters[type].push(value);
+        }else{
+          updatedFilters[type] = updatedFilters[type].filter(item => item!== value);
+        }
+        return updatedFilters;
+    })
+  }
+  const handleSortChange = (sortOption)=>{
+      setSelectedSort(sortOption);
+  }
 
+  //Function to check if a room matches the selected room types
+  const matchesRoomType = (room)=>{
+    return SelectedFilters.roomType.length
+  }
 
   return (
     <div className='flex  flex-col-reverse lg:flex-row items-start justify-between pt-28 md:pt-35 px-4 md:px-16 lg:px-24 xl:px-32'>

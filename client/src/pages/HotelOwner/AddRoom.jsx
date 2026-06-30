@@ -119,7 +119,7 @@ const AddRoom = () => {
                     </div>
                 ))}
             </div>
-            <button className="bg-blue-800 text-white px-8 py-2 rounded mt-8 cursor-pointer">
+            <button className="bg-blue-800 text-white px-8 py-2 rounded mt-8 cursor-pointer" disabled={loading}>
                {loading ? "adding..." : "Add Room"}
             </button>
         </form>
