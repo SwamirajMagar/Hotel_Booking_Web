@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { assets, facilityIcons, roomsDummyData } from '../assets/assets';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import StarRating from '../components/StarRating';
@@ -71,7 +71,50 @@ const AllRoom = () => {
 
   //Function to check if a room matches the selected room types
   const matchesRoomType = (room)=>{
-    return SelectedFilters.roomType.length
+    return SelectedFilters.roomType.length === 0 || SelectedFilters.roomType.includes(room.roomType);
+  }
+
+  // function to check if room matches the selected price range
+  const matchesPriceRange = (room)=>{
+      return SelectedFilters.priceRange.length === 0 || SelectedFilters.priceRange.some(range => {
+        const [min, max] =range.split(' to ').map(Number);
+        return room.pricePerNight >= min && room.pricePerNight <= max;
+      })
+  }
+  //function to sort rooms based on the selected sort option
+  const sortRooms = (a, b) =>{
+    if (selectedSort === 'Price Low to High') {
+      return a.pricePerNight - b.pricePerNight;
+    }
+    if(selectedSort === 'Price High to Low'){
+      return b.pricePerNight - a.pricePerNight;
+    }
+    if (selectedSort === 'Newest First') {
+      return new Date(b.createdAt) - new Date(a.createdAt)
+    }
+    return 0;
+  }
+
+  //filter destination
+  const filterDestination = (room)=>{
+    const destination = searchParams.get('destination');
+    if (!destination) return true;
+    return room.hotel.city.toLowerCase().includes(destination.toLowerCase())
+  }
+
+  //Filter and sort rooms based on the selected filters and sort option
+  const filteredRooms = useMemo(()=>{
+    return rooms.filter(room => matchesRoomType(room) && matchesPriceRange(room) && filterDestination(room)).sort(sortRooms);
+  }, [rooms, SelectedFilters, selectedSort, searchParams])
+
+  //clear all filters
+  const clearFilters = ()=>{
+    setSelectedFilters({
+      roomType: [],
+      priceRange: [],
+    });
+    setSelectedSort('');
+    setSearchParams({});
   }
 
   return (
@@ -82,7 +125,7 @@ const AllRoom = () => {
           <p className='text-sm md:text-base text-gray-500/90 mt-2'>Take advantage of our limited time offers and special package to enhance stay and create unforgettable memories.</p>
         </div>
 
-        {roomsDummyData.map((room) => (
+        {filteredRooms.map((room) => (
           <div key={room._id} className='flex flex-col md:flex-row items-start py-10 gap-6 border-b border-gray-300 last:border-0 last:pb-30'>
             <img onClick={() => { navigate(`/rooms/${room._id}`); scrollTo(0, 0) }}
               src={room.images[0]} alt="hotel img" title='View room Details' className='max-h-65 md:w-1/2 rounded-xl shadow-lg object-cover cursor-pointer' />
@@ -133,21 +176,21 @@ const AllRoom = () => {
             <p className='font-medium text-gray-800 pb-2'>
               Popular Filters </p>
             {roomTypes.map((room, index) => (
-              <CheckBox key={index} label={room} />
+              <CheckBox key={index} label={room} selected={SelectedFilters.roomType.includes(room)} onChnage={(checked)=>handleFilterChange(checked, room, 'roomType')}/>
             ))}
           </div>
 
           <div className='px-5 pt-5'>
             <p className='font-medium text-gray-800 pb-2'>Price Range </p>
             {priceRanges.map((range, index) => (
-              <CheckBox key={index} label={`$ ${range}`} />
+              <CheckBox key={index} label={`${currency} ${range}`} selected={SelectedFilters.priceRange.includes(range)} onChnage={(checked)=>handleFilterChange(checked, range, 'priceRange')}/>
             ))}
           </div>
 
            <div className='px-5 pt-5 pb-7'>
             <p className='font-medium text-gray-800 pb-2'>Sort By </p>
             {sortOption.map((option, index) => (
-              <RadioButton key={index} label={option}/>
+              <RadioButton key={index} label={option} selected={selectedSort === option} onChnage={()=> handleSortChange(option)}/>
             ))}
           </div>
         </div>
